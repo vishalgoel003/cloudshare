@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,12 +21,14 @@ public class UserDAOService {
     private static final String CLASS_NAME = "UserDAOService";
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final Logger logger;
 
     @Autowired
     public UserDAOService(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.logger = LoggerFactory.getLogger(CLASS_NAME);
+        this.passwordEncoder = new BCryptPasswordEncoder();;
     }
 
     public SignUpResponse createUser(SignUpRequest signUpRequest){
@@ -36,7 +40,7 @@ public class UserDAOService {
 
         User user = new User();
         user.setUserType(UserType.valueOf(signUpRequest.getUserType()));
-        user.setPassword(signUpRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setEmail(signUpRequest.getEmail());
         user.setName(signUpRequest.getName());
         user.setMobile(signUpRequest.getMobile());
