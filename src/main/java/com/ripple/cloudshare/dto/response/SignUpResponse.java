@@ -1,6 +1,7 @@
 package com.ripple.cloudshare.dto.response;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ripple.cloudshare.data.entity.User;
 
 public class SignUpResponse {
@@ -9,6 +10,7 @@ public class SignUpResponse {
     private String name;
     private String email;
     private String mobile;
+    @JsonProperty(value = "user_type")
     private String userType;
 
     public static SignUpResponse fromUserEntity(User userEntity){

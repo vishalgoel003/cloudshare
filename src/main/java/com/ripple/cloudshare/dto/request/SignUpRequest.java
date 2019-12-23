@@ -7,23 +7,26 @@ import com.ripple.cloudshare.dto.validator.ValueOfEnum;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import static com.ripple.cloudshare.ApplicationConstants.*;
+
 public class SignUpRequest {
 
     @NotNull(message = "name can not be empty")
     private String name;
 
     @NotNull(message = "email can not be empty")
-    @Pattern(regexp = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+    @Pattern(regexp = EMAIL_VALIDATION_REGEX,
         message = "email should be valid")
     private String email;
 
     @NotNull(message = "mobile can not be empty")
-    @Pattern(regexp = "^[2-9]{2}\\d{8}$",
+    @Pattern(regexp = MOBILE_VALIDATION_REGEX,
         message = "mobile should be valid 10 digit")
     private String mobile;
 
     @JsonProperty(value = "user_type")
-    @ValueOfEnum(enumClass = UserType.class)
+    @ValueOfEnum(enumClass = UserType.class,
+        message = INVALID_USER_TYPE_MESSAGE)
     private String userType = UserType.NON_ADMIN.name();
 
     @NotNull(message = "password can not be empty")
