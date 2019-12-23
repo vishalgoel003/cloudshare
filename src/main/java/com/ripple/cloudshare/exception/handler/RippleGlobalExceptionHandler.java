@@ -36,18 +36,20 @@ public class RippleGlobalExceptionHandler extends ResponseEntityExceptionHandler
             RippleUserRuntimeException.class
     })
     protected ResponseEntity<Object> handleRippleUserRuntimeException(RippleUserRuntimeException ex, WebRequest request) {
-        Map<String, Object> body = getResponseMap(HttpStatus.BAD_REQUEST);
+        HttpStatus responseStatus = ex.getResponseStatus() != null ? ex.getResponseStatus() : HttpStatus.BAD_REQUEST;
+        Map<String, Object> body = getResponseMap(responseStatus);
         body.put("errors", Collections.singletonList(ex.getMessage()));
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, responseStatus);
     }
 
     @ExceptionHandler(value = {
             RippleAppRuntimeException.class
     })
     protected ResponseEntity<Object> handleRippleAppRuntimeException(RippleAppRuntimeException ex, WebRequest request) {
-        Map<String, Object> body = getResponseMap(HttpStatus.INTERNAL_SERVER_ERROR);
+        HttpStatus responseStatus = ex.getResponseStatus() != null ? ex.getResponseStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+        Map<String, Object> body = getResponseMap(responseStatus);
         body.put("errors", Collections.singletonList(ex.getMessage()));
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(body, responseStatus);
     }
 
     private Map<String, Object> getResponseMap(HttpStatus status) {

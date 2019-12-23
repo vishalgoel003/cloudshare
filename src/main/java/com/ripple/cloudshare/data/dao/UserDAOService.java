@@ -10,6 +10,7 @@ import com.ripple.cloudshare.exception.RippleUserRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,5 +50,19 @@ public class UserDAOService {
 
         SignUpResponse signUpResponse = SignUpResponse.fromUserEntity(user);
         return signUpResponse;
+    }
+
+    public Long validateLoginAndReturnUserId(String email, String password){
+        User user = userRepository.findByEmail(email);
+
+        if (user == null){
+            logger.error("No user exists with given email" + email);
+            throw new RippleUserRuntimeException("No user exists with given email", HttpStatus.BAD_REQUEST);
+        } else if (!user.getPassword().equals(password)) {
+            logger.error("Incorrect password for user with email" + email);
+            throw new RippleUserRuntimeException("Incorrect password", HttpStatus.FORBIDDEN);
+        }
+
+        return user.getId();
     }
 }

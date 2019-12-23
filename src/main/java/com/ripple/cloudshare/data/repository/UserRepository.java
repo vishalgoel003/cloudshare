@@ -12,4 +12,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
     )
     long findRecordsMatchingDetails(String email, String mobile);
 
+    User findByEmail(String email);
 }
