@@ -15,9 +15,9 @@ public class DataLoader implements CommandLineRunner {
 
     private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(UserRepository userRepository) {
+    public DataLoader(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override

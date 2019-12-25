@@ -11,9 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserDAOService {
@@ -21,14 +21,12 @@ public class UserDAOService {
     private static final String CLASS_NAME = "UserDAOService";
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final Logger logger;
 
     @Autowired
     public UserDAOService(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.logger = LoggerFactory.getLogger(CLASS_NAME);
-        this.passwordEncoder = new BCryptPasswordEncoder();;
     }
 
     public SignUpResponse createUser(SignUpRequest signUpRequest){
@@ -40,7 +38,7 @@ public class UserDAOService {
 
         User user = new User();
         user.setUserType(UserType.valueOf(signUpRequest.getUserType()));
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setPassword(signUpRequest.getPassword());
         user.setEmail(signUpRequest.getEmail());
         user.setName(signUpRequest.getName());
         user.setMobile(signUpRequest.getMobile());
@@ -60,7 +58,7 @@ public class UserDAOService {
         User user = userRepository.findByEmail(email);
 
         if (user == null){
-            logger.error("No user exists with given email" + email);
+            logger.error("No user exists with given email: " + email);
             throw new RippleUserRuntimeException("No user exists with given email", HttpStatus.BAD_REQUEST);
         } else if (!user.getPassword().equals(password)) {
             logger.error("Incorrect password for user with email" + email);
@@ -69,4 +67,23 @@ public class UserDAOService {
 
         return user.getId();
     }
+
+    public User getByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null){
+            logger.error("No user exists with given email: " + email);
+            throw new RippleUserRuntimeException("No user exists with given email", HttpStatus.BAD_REQUEST);
+        }
+        return user;
+    }
+
+    public User getById(Long id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(!optionalUser.isPresent() || optionalUser.get().getDeleted()) {
+            logger.error("No user exists with given id: " + id);
+            throw new RippleUserRuntimeException("No user exists with given id", HttpStatus.BAD_REQUEST);
+        }
+        return optionalUser.get();
+    }
+
 }
