@@ -4,7 +4,6 @@ import com.ripple.cloudshare.data.entity.User;
 import com.ripple.cloudshare.data.entity.UserType;
 import com.ripple.cloudshare.data.repository.UserRepository;
 import com.ripple.cloudshare.dto.request.SignUpRequest;
-import com.ripple.cloudshare.dto.response.SignUpResponse;
 import com.ripple.cloudshare.exception.RippleAppRuntimeException;
 import com.ripple.cloudshare.exception.RippleUserRuntimeException;
 import org.slf4j.Logger;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,7 +29,7 @@ public class UserDAOService {
         this.logger = LoggerFactory.getLogger(CLASS_NAME);
     }
 
-    public SignUpResponse createUser(SignUpRequest signUpRequest){
+    public User createUser(SignUpRequest signUpRequest){
         Long conflictingRecords = userRepository.findRecordsMatchingDetails(signUpRequest.getEmail(), signUpRequest.getMobile());
         if(0L < conflictingRecords) {
             logger.info("Unique constraint not satisfied");
@@ -50,8 +50,7 @@ public class UserDAOService {
             throw new RippleAppRuntimeException("Something went wrong, please retry after some time");
         }
 
-        SignUpResponse signUpResponse = SignUpResponse.fromUserEntity(user);
-        return signUpResponse;
+        return user;
     }
 
     public Long validateLoginAndReturnUserId(String email, String password){
@@ -86,4 +85,19 @@ public class UserDAOService {
         return optionalUser.get();
     }
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User deleteById(Long id) {
+        User user = getById(id);
+        if (user.getUserType().equals(UserType.ADMIN)){
+            logger.error("Attempt to delete admin user id: " + id);
+            throw new RippleUserRuntimeException("Can not delete admin user with given id", HttpStatus.BAD_REQUEST);
+        }
+        user.setDeleted(true); //soft delete
+        user = userRepository.save(user);
+        //TODO: call delayed async method to decommission related machines and hard delete user
+        return user;
+    }
 }

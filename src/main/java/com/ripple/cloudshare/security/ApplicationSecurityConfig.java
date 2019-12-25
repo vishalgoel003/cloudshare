@@ -28,10 +28,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     SecurityUserDetailsService securityUserDetailsService;
 
-    @Bean
-    public JwtAuthenticationEntryPoint unauthorizedHandler() {
-        return new JwtAuthenticationEntryPoint();
-    }
+    @Autowired
+    public JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Autowired
     JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -62,7 +60,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf()
                 .disable()
             .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedHandler())
+                .authenticationEntryPoint(unauthorizedHandler)
                 .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -79,18 +77,22 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                     .permitAll()
+                .antMatchers("/h2-console", "/h2-console/**")
+                    .permitAll()
                 .antMatchers("/auth/**")
                     .permitAll()
                 .antMatchers(HttpMethod.GET, "/users/me")
                     .authenticated()
-                .antMatchers(HttpMethod.GET, "/users/**")
+                .antMatchers(HttpMethod.GET, "/users", "/users/**")
                     .permitAll()
                 .anyRequest()
                     .authenticated();
 
+        //TODO: remove once move to postgres
+        httpSecurity.headers().frameOptions().disable();
+
         // Add our custom JWT security filter
         httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
     }
 
 }

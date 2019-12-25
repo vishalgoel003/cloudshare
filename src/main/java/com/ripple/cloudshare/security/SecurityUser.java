@@ -22,7 +22,8 @@ public class SecurityUser implements UserDetails {
         this.id = id;
         this.username = email;
         this.password = password;
-        this.authorities = Collections.singletonList(new SimpleGrantedAuthority(userType.name()));
+        //Took so many hours to figure out Spring needs all roles to start with: ROLE_ and get RBAC working
+        this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userType.name()));
         this.markedDeleted = markedDeleted;
     }
 

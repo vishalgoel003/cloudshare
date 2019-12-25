@@ -22,7 +22,7 @@ public class SecurityUserDetailsService implements UserDetailsService {
         return SecurityUser.create(user);
     }
 
-    public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
+    public SecurityUser loadUserById(Long id) throws UsernameNotFoundException {
         User user = userDAOService.getById(id);
         return SecurityUser.create(user);
     }

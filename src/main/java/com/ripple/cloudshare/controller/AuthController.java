@@ -1,6 +1,7 @@
 package com.ripple.cloudshare.controller;
 
 import com.ripple.cloudshare.data.dao.UserDAOService;
+import com.ripple.cloudshare.data.entity.User;
 import com.ripple.cloudshare.dto.request.SignInRequest;
 import com.ripple.cloudshare.dto.request.SignUpRequest;
 import com.ripple.cloudshare.dto.response.SignInResponse;
@@ -49,7 +50,7 @@ public class AuthController {
         logger.info("Request received: " + signUpRequest);
         //encrypting password
         signUpRequest.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-        return userDAOService.createUser(signUpRequest);
+        return SignUpResponse.fromUserEntity(userDAOService.createUser(signUpRequest));
     }
 
     @PostMapping("/sign-in")
