@@ -8,10 +8,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query(
-            value = "SELECT COUNT(*) FROM User WHERE EMAIL = ?1 OR MOBILE = ?2",
-            nativeQuery = true
-    )
+    @Query(value = "SELECT COUNT(user) FROM User user WHERE user.email=:email or user.mobile=:mobile")
     long findRecordsMatchingDetails(String email, String mobile);
 
     User findByEmail(String email);
