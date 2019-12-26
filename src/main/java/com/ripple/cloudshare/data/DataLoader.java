@@ -1,10 +1,11 @@
 package com.ripple.cloudshare.data;
 
+import com.ripple.cloudshare.data.entity.Machine;
+import com.ripple.cloudshare.data.entity.OperatingSystem;
 import com.ripple.cloudshare.data.entity.User;
 import com.ripple.cloudshare.data.entity.UserType;
 import com.ripple.cloudshare.data.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,14 @@ public class DataLoader implements CommandLineRunner {
         defaultAdminUser.setEmail("vishalgoel003@gmail.com");
         defaultAdminUser.setPassword(passwordEncoder.encode("root"));
         defaultAdminUser.setUserType(UserType.ADMIN);
+
+        Machine defaultMachine = new Machine();
+        defaultMachine.setCpuCores(2);
+        defaultMachine.setHdd(10);
+        defaultMachine.setRam(16);
+        defaultMachine.setOperatingSystem(OperatingSystem.MAC);
+        defaultMachine.setHostId(1);
+        defaultAdminUser.addMachine(defaultMachine);
 
         userRepository.save(defaultAdminUser);
 

@@ -1,6 +1,8 @@
 package com.ripple.cloudshare.data.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -28,6 +30,9 @@ public class User {
     @Column(name = "user_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserType userType;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Machine> machines;
 
     public Long getId() {
         return id;
@@ -83,5 +88,21 @@ public class User {
 
     public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+    public List<Machine> getMachines() {
+        return machines;
+    }
+
+    public void setMachines(List<Machine> machines) {
+        this.machines = machines;
+    }
+
+    public void addMachine(Machine machine) {
+        if(this.machines == null){
+            this.machines = new ArrayList<>();
+        }
+        this.machines.add(machine);
+        machine.setUser(this);
     }
 }
