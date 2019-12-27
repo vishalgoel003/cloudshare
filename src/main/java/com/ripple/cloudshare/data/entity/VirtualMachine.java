@@ -3,8 +3,8 @@ package com.ripple.cloudshare.data.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "machine")
-public class Machine {
+@Table(name = "virtual_machine")
+public class VirtualMachine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,11 +23,15 @@ public class Machine {
     @Column(name = "cpu_cores", nullable = false)
     private Integer cpuCores;
 
-    @Column(name = "host_id", nullable = false)
-    private Integer hostId;
+    @Column(name = "description")
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "server_id", nullable = false)
+    private Server server;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Long getId() {
@@ -70,12 +74,12 @@ public class Machine {
         this.cpuCores = cpuCores;
     }
 
-    public Integer getHostId() {
-        return hostId;
+    public Server getServer() {
+        return server;
     }
 
-    public void setHostId(Integer hostId) {
-        this.hostId = hostId;
+    public void setServer(Server server) {
+        this.server = server;
     }
 
     public User getUser() {
@@ -84,5 +88,13 @@ public class Machine {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

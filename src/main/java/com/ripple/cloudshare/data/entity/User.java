@@ -32,7 +32,7 @@ public class User {
     private UserType userType;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Machine> machines;
+    private List<VirtualMachine> virtualMachines;
 
     public Long getId() {
         return id;
@@ -90,19 +90,19 @@ public class User {
         this.userType = userType;
     }
 
-    public List<Machine> getMachines() {
-        return machines;
+    public List<VirtualMachine> getVirtualMachines() {
+        return virtualMachines;
     }
 
-    public void setMachines(List<Machine> machines) {
-        this.machines = machines;
+    public void setVirtualMachines(List<VirtualMachine> virtualMachines) {
+        this.virtualMachines = virtualMachines;
     }
 
-    public void addMachine(Machine machine) {
-        if(this.machines == null){
-            this.machines = new ArrayList<>();
+    public void addVirtualMachine(VirtualMachine virtualMachine) {
+        if(this.virtualMachines == null){
+            this.virtualMachines = new ArrayList<>();
         }
-        this.machines.add(machine);
-        machine.setUser(this);
+        this.virtualMachines.add(virtualMachine);
+        virtualMachine.setUser(this);
     }
 }
