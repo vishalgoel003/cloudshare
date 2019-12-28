@@ -8,6 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
+
 @Component
 public class DataLoader implements CommandLineRunner {
 
@@ -27,48 +30,57 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        User defaultAdminUser = new User();
-        defaultAdminUser.setName("Vishal");
-        defaultAdminUser.setMobile("9816923672");
-        defaultAdminUser.setEmail("vishalgoel003@gmail.com");
-        defaultAdminUser.setPassword(passwordEncoder.encode("root"));
-        defaultAdminUser.setUserType(UserType.ADMIN);
-        defaultAdminUser = userRepository.save(defaultAdminUser);
+        User systemDaemonUser = new User();
+        systemDaemonUser.setName("SYSTEM");
+        systemDaemonUser.setMobile("9999988888");
+        systemDaemonUser.setEmail("no-reply@ripple.com");
+        systemDaemonUser.setPassword(passwordEncoder.encode("cloudshare"));
+        systemDaemonUser.setUserType(UserType.ADMIN);
+        systemDaemonUser = userRepository.save(systemDaemonUser);
 
-        Server defaultServer = new Server();
-        defaultServer.setServerName("server-A");
-        defaultServer.setSharedCpuCores(256);
-        defaultServer.setSharedMemory(768);
-        defaultServer.setSharedDisk(32000);
-        defaultServer = serverRepository.save(defaultServer);
+        Long userId = systemDaemonUser.getId();
 
-        VirtualMachine defaultVirtualMachine = new VirtualMachine();
-        defaultVirtualMachine.setDescription("Sample service VM");
-        defaultVirtualMachine.setCpuCores(2);
-        defaultVirtualMachine.setHdd(10);
-        defaultVirtualMachine.setRam(16);
-        defaultVirtualMachine.setOperatingSystem(OperatingSystem.LINUX);
-        defaultVirtualMachine.setUser(defaultAdminUser);
-        defaultVirtualMachine.setServer(defaultServer);
-        virtualMachineRepository.save(defaultVirtualMachine);
+        Server managerServer = new Server();
+        managerServer.setServerName("server-A");
+        managerServer.setSharedCpuCores(256);
+        managerServer.setSharedMemory(768);
+        managerServer.setSharedDisk(32000);
+        managerServer = serverRepository.save(managerServer);
 
+        VirtualMachine systemVirtualMachine = new VirtualMachine();
+        systemVirtualMachine.setDescription("Sample service VM");
+        systemVirtualMachine.setCpuCores(2);
+        systemVirtualMachine.setHdd(10);
+        systemVirtualMachine.setRam(16);
+        systemVirtualMachine.setOperatingSystem(OperatingSystem.LINUX);
+        systemVirtualMachine.setUser(systemDaemonUser);
+        systemVirtualMachine.setServer(managerServer);
+        virtualMachineRepository.save(systemVirtualMachine);
+
+        //below is for experiments and trials
 
         User user = new User();
-        user.setName("Tishal");
-        user.setMobile("9816923671");
-        user.setEmail("vishalgoel004@gmail.com");
-        user.setPassword(passwordEncoder.encode("root"));
+        user.setName("Vishal");
+        user.setMobile("9816923670");
+        user.setEmail("vishalgoel03@gmail.com");
+        user.setPassword(passwordEncoder.encode("vg003"));
         user.setUserType(UserType.ADMIN);
 
         userRepository.save(user);
 
         user = new User();
-        user.setName("Rishal");
-        user.setMobile("9816923670");
-        user.setEmail("vishalgoel005@gmail.com");
+        user.setName("Abhishek");
+        user.setMobile("9816923600");
+        user.setEmail("vishalgoel5@gmail.com");
         user.setPassword(passwordEncoder.encode("root"));
         user.setUserType(UserType.NON_ADMIN);
 
         userRepository.save(user);
+
+        List<VirtualMachine> machineList = virtualMachineRepository.findAllByUserId(userId);
+        machineList.forEach(m -> System.out.println(m.getId()));
+
+        Optional<User> machineUser = userRepository.getUserByMachineId(machineList.get(0).getId());
+        System.out.println(machineUser.get().getUserType().name());
     }
 }

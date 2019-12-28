@@ -10,6 +10,7 @@ public class Server {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Access(AccessType.PROPERTY)
     private Long id;
 
     @Column(name = "server_name", nullable = false)

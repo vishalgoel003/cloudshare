@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> getByEmail(String username);
 
+    @Query(value = "SELECT machine.user FROM VirtualMachine machine WHERE machine.id=:virtualMachineId")
+    Optional<User> getUserByMachineId(Long virtualMachineId);
 }
