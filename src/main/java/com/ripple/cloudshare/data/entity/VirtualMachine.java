@@ -23,8 +23,8 @@ public class VirtualMachine {
     @Column(name = "cpu_cores", nullable = false)
     private Integer cpuCores;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "removed", nullable = false)
+    private Boolean removed = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "server_id", nullable = false)
@@ -90,11 +90,11 @@ public class VirtualMachine {
         this.user = user;
     }
 
-    public String getDescription() {
-        return description;
+    public Boolean getRemoved() {
+        return removed;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setRemoved(Boolean deleted) {
+        this.removed = deleted;
     }
 }

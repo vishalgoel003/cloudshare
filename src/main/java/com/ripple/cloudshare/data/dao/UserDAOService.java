@@ -6,6 +6,7 @@ import com.ripple.cloudshare.data.repository.UserRepository;
 import com.ripple.cloudshare.dto.request.SignUpRequest;
 import com.ripple.cloudshare.exception.RippleAppRuntimeException;
 import com.ripple.cloudshare.exception.RippleUserRuntimeException;
+import com.ripple.cloudshare.service.VirtualMachineDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,19 @@ public class UserDAOService {
     private static final String CLASS_NAME = "UserDAOService";
 
     private final UserRepository userRepository;
+    private final VirtualMachineDAOService virtualMachineDAOService;
+
     private final Logger logger;
 
     @Autowired
-    public UserDAOService(UserRepository userRepository) {
+    public UserDAOService(UserRepository userRepository, VirtualMachineDAOService virtualMachineDAOService) {
         this.userRepository = userRepository;
+        this.virtualMachineDAOService = virtualMachineDAOService;
         this.logger = LoggerFactory.getLogger(CLASS_NAME);
     }
 
     public User createUser(SignUpRequest signUpRequest){
-        Long conflictingRecords = userRepository.findRecordsMatchingDetails(signUpRequest.getEmail(), signUpRequest.getMobile());
+        long conflictingRecords = userRepository.findRecordsMatchingDetails(signUpRequest.getEmail(), signUpRequest.getMobile());
         if(0L < conflictingRecords) {
             logger.info("Unique constraint not satisfied");
             throw new RippleUserRuntimeException("email or mobile already in use");
@@ -98,6 +102,11 @@ public class UserDAOService {
         user.setDeleted(true); //soft delete
         user = userRepository.save(user);
         //TODO: call delayed async method to decommission related machines and hard delete user
+        List<VirtualMachineDetail> machines = virtualMachineDAOService.getLiveVirtualMachinesForUser(user.getId());
+        for (VirtualMachineDetail machine : machines) {
+            virtualMachineDAOService.removeVirtualMachineForUser(machine.getVirtualMachineId(), user.getId());
+        }
+        //userRepository.delete(user);
         return user;
     }
 }

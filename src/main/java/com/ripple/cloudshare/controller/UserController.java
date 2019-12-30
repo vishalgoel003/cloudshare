@@ -30,6 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO getUser(@PathVariable(value = "id") String stringId){
         Long id = RequestParamConverter.longFromString(stringId, "Invalid Id");
         return UserDTO.fromUser(userDAOService.getById(id));
@@ -41,8 +42,8 @@ public class UserController {
         return UserDTO.fromUser(userDAOService.getById(currentUser.getId()));
     }
 
-
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> getAllUsers(){
         return userDAOService.getAllUsers().stream()
                 .map(UserDTO::fromUser)

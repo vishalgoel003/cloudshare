@@ -83,4 +83,15 @@ public class Server {
         this.virtualMachines.add(virtualMachine);
         virtualMachine.setServer(this);
     }
+
+    @Override
+    public String toString() {
+        return "Server{" +
+                "id=" + id +
+                ", serverName='" + serverName + '\'' +
+                ", sharedMemory=" + sharedMemory +
+                ", sharedDisk=" + sharedDisk +
+                ", sharedCpuCores=" + sharedCpuCores +
+                '}';
+    }
 }

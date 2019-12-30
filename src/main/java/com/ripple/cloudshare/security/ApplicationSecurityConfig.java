@@ -81,10 +81,10 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .antMatchers("/auth/**")
                     .permitAll()
-                .antMatchers(HttpMethod.GET, "/users/me")
-                    .authenticated()
-                .antMatchers(HttpMethod.GET, "/users", "/users/**")
-                    .permitAll()
+//                .antMatchers(HttpMethod.GET, "/users/me")
+//                    .authenticated()
+//                .antMatchers(HttpMethod.GET, "/users", "/users/**")
+//                    .permitAll()
                 .anyRequest()
                     .authenticated();
 
