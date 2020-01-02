@@ -47,8 +47,35 @@ To simulate another data-store, you may run docker image. And change application
 Properties to change:
 
 ```spring.datasource.url
+spring.datasource.url
 spring.datasource.driverClassName
 spring.datasource.username
 spring.datasource.password
 spring.jpa.database-platform
 ```
+
+### Postgres example:
+
+Run a postgres docker container:
+>docker run --name postgres-container -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+
+Add the following dependency in pom.xml:
+```$xslt
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+</dependency>
+```
+
+Configure the following settings in `application.properties`
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=mysecretpassword
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL9Dialect
+```
+
+For removing container you can use:
+>docker stop postgres-container && docker system prune -f
+
+***Note***: With above settings, postgres did not allow to create a table with name **_user_** and had to change the table name to _**application_user**_ in entity definition.
