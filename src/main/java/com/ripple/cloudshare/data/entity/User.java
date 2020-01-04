@@ -9,7 +9,11 @@ import java.util.List;
 public class User extends AuditEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "user_id_generator")
+    @SequenceGenerator(
+            name = "user_id_generator",
+            sequenceName = "user_id"
+    )
     @Access(AccessType.PROPERTY)
     private Long id;
 

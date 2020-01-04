@@ -7,7 +7,11 @@ import javax.persistence.*;
 public class VirtualMachine {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "virtual_machine_id_generator")
+    @SequenceGenerator(
+            name = "virtual_machine_id_generator",
+            sequenceName = "virtual_machine_id"
+    )
     private Long id;
 
     @Column(name = "operating_system", nullable = false)

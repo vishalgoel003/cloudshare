@@ -9,7 +9,11 @@ import java.util.List;
 public class Server {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "server_id_generator")
+    @SequenceGenerator(
+            name = "server_id_generator",
+            sequenceName = "server_id"
+    )
     @Access(AccessType.PROPERTY)
     private Long id;
 
