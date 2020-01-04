@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "application_user")
-public class User {
+public class User extends AuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
