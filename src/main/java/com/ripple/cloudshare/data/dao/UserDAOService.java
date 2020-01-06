@@ -10,6 +10,10 @@ import com.ripple.cloudshare.service.VirtualMachineDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +37,11 @@ public class UserDAOService {
         this.logger = LoggerFactory.getLogger(CLASS_NAME);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", allEntries = true)
+    }, put = {
+            @CachePut(value = "user_by_id", key = "#result.id")
+    })
     public User createUser(SignUpRequest signUpRequest){
         long conflictingRecords = userRepository.findRecordsMatchingDetails(signUpRequest.getEmail(), signUpRequest.getMobile());
         if(0L < conflictingRecords) {
@@ -80,7 +89,10 @@ public class UserDAOService {
         return user;
     }
 
+    @Cacheable(value = "user_by_id", key = "#id")
     public User getById(Long id) {
+        logger.info("Not using cache");
+
         Optional<User> optionalUser = userRepository.findById(id);
         if(!optionalUser.isPresent() || optionalUser.get().getDeleted()) {
             logger.error("No user exists with given id: " + id);
@@ -89,10 +101,16 @@ public class UserDAOService {
         return optionalUser.get();
     }
 
+    @Cacheable(value = "users")
     public List<User> getAllUsers() {
+        logger.info("Not using cache");
         return userRepository.findAll();
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", allEntries = true),
+            @CacheEvict(value = "user_by_id", key = "#id")
+    })
     public User deleteById(Long id) {
         User user = getById(id);
         if (user.getUserType().equals(UserType.ADMIN)){
