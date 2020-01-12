@@ -88,8 +88,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                     .authenticated();
 
-        //TODO: remove once move to postgres
-        httpSecurity.headers().frameOptions().disable();
+        httpSecurity.headers().frameOptions().disable(); //Only required when working with H2 db, for console visibility
 
         // Add our custom JWT security filter
         httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

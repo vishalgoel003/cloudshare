@@ -10,6 +10,7 @@ import com.ripple.cloudshare.service.VirtualMachineRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -118,5 +119,14 @@ public class VirtualMachineDAOService {
         logger.warn("forceRemoveVirtualMachineForUser called to remove virtualMachineId: " + virtualMachineId
             + ", userId: " + userId);
         return removeVirtualMachineByUser(virtualMachineId, userId);
+    }
+
+    @Async
+    public void deleteAllMachinesForUser(User user) {
+        logger.info("deleting VMs in async mode for user id: " + user.getId());
+        List<VirtualMachineDetail> machines = getLiveVirtualMachinesForUser(user.getId());
+        for (VirtualMachineDetail machine : machines) {
+            removeVirtualMachineForUser(machine.getVirtualMachineId(), user.getId());
+        }
     }
 }

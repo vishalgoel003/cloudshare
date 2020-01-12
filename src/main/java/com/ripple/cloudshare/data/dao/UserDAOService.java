@@ -6,7 +6,6 @@ import com.ripple.cloudshare.data.repository.UserRepository;
 import com.ripple.cloudshare.dto.request.SignUpRequest;
 import com.ripple.cloudshare.exception.RippleAppRuntimeException;
 import com.ripple.cloudshare.exception.RippleUserRuntimeException;
-import com.ripple.cloudshare.service.VirtualMachineDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,21 +65,8 @@ public class UserDAOService {
         return user;
     }
 
-    public Long validateLoginAndReturnUserId(String email, String password){
-        User user = userRepository.findByEmail(email);
-
-        if (user == null){
-            logger.error("No user exists with given email: " + email);
-            throw new RippleUserRuntimeException("No user exists with given email", HttpStatus.BAD_REQUEST);
-        } else if (!user.getPassword().equals(password)) {
-            logger.error("Incorrect password for user with email" + email);
-            throw new RippleUserRuntimeException("Incorrect password", HttpStatus.FORBIDDEN);
-        }
-
-        return user.getId();
-    }
-
     public User getByEmail(String email) {
+        logger.info("Getting user info by email");
         User user = userRepository.findByEmail(email);
         if (user == null){
             logger.error("No user exists with given email: " + email);
@@ -119,12 +105,8 @@ public class UserDAOService {
         }
         user.setDeleted(true); //soft delete
         user = userRepository.save(user);
-        //TODO: call delayed async method to decommission related machines and hard delete user
-        List<VirtualMachineDetail> machines = virtualMachineDAOService.getLiveVirtualMachinesForUser(user.getId());
-        for (VirtualMachineDetail machine : machines) {
-            virtualMachineDAOService.removeVirtualMachineForUser(machine.getVirtualMachineId(), user.getId());
-        }
-        //userRepository.delete(user);
+        virtualMachineDAOService.deleteAllMachinesForUser(user);
         return user;
     }
+
 }
