@@ -1,5 +1,6 @@
 package com.ripple.cloudshare.controller;
 
+import com.ripple.cloudshare.ApplicationConstants;
 import com.ripple.cloudshare.data.dao.UserDAOService;
 import com.ripple.cloudshare.dto.RequestParamConverter;
 import com.ripple.cloudshare.dto.entity.UserDTO;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.ripple.cloudshare.ApplicationConstants.SELF_DESTRUCT_NOT_ALLOWED;
 
 @RestController
 @RequestMapping(UserController.USER_CONTROLLER_ROOT)
@@ -56,7 +59,7 @@ public class UserController {
         Long id = RequestParamConverter.longFromString(stringId, "Invalid Id");
         if (currentUser.getId().equals(id)){
             logger.warn("User tried deleting self: " + currentUser.getId());
-            throw new RippleAppRuntimeException("Suicide is not allowed at this platform");
+            throw new RippleAppRuntimeException(SELF_DESTRUCT_NOT_ALLOWED);
         }
         return UserDTO.fromUser(userDAOService.deleteById(id));
     }

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.ripple.cloudshare.ApplicationConstants.*;
+
 @Service
 public class UserDAOService {
 
@@ -45,7 +47,7 @@ public class UserDAOService {
         long conflictingRecords = userRepository.findRecordsMatchingDetails(signUpRequest.getEmail(), signUpRequest.getMobile());
         if(0L < conflictingRecords) {
             logger.info("Unique constraint not satisfied");
-            throw new RippleUserRuntimeException("email or mobile already in use");
+            throw new RippleUserRuntimeException(EMAIL_OR_MOBILE_ALREADY_IN_USE);
         }
 
         User user = new User();
@@ -59,7 +61,7 @@ public class UserDAOService {
             user = userRepository.save(user);
         } catch (Exception e){
             logger.error("Error while saving the record", e);
-            throw new RippleAppRuntimeException("Something went wrong, please retry after some time");
+            throw new RippleAppRuntimeException(SOMETHING_WENT_WRONG);
         }
 
         return user;
@@ -70,7 +72,7 @@ public class UserDAOService {
         User user = userRepository.findByEmail(email);
         if (user == null){
             logger.error("No user exists with given email: " + email);
-            throw new RippleUserRuntimeException("No user exists with given email", HttpStatus.BAD_REQUEST);
+            throw new RippleUserRuntimeException(NO_USER_WITH_GIVEN_EMAIL, HttpStatus.BAD_REQUEST);
         }
         return user;
     }
@@ -82,7 +84,7 @@ public class UserDAOService {
         Optional<User> optionalUser = userRepository.findById(id);
         if(!optionalUser.isPresent() || optionalUser.get().getDeleted()) {
             logger.error("No user exists with given id: " + id);
-            throw new RippleUserRuntimeException("No user exists with given id", HttpStatus.BAD_REQUEST);
+            throw new RippleUserRuntimeException(NO_USER_WITH_GIVEN_ID, HttpStatus.BAD_REQUEST);
         }
         return optionalUser.get();
     }
@@ -101,7 +103,7 @@ public class UserDAOService {
         User user = getById(id);
         if (user.getUserType().equals(UserType.ADMIN)){
             logger.error("Attempt to delete admin user id: " + id);
-            throw new RippleUserRuntimeException("Can not delete admin user with given id", HttpStatus.BAD_REQUEST);
+            throw new RippleUserRuntimeException(ADMIN_CAN_NOT_DELETE_OTHER_ADMIN, HttpStatus.BAD_REQUEST);
         }
         user.setDeleted(true); //soft delete
         user = userRepository.save(user);

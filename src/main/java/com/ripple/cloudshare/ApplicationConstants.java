@@ -14,4 +14,13 @@ public class ApplicationConstants {
     public static final String INVALID_USER_TYPE_MESSAGE = "The value of user_type must be from: " + USER_TYPE_VALIDATION_REGEX;
     public static final String INVALID_OPERATING_SYSTEM_MESSAGE = "The value of operating_system must be from: " + OPERATING_SYSTEM_VALIDATION_REGEX;
 
+    //Exception messages
+    public static final String SELF_DESTRUCT_NOT_ALLOWED = "Suicide is not allowed at this platform";
+    public static final String ADMIN_CAN_NOT_DELETE_OTHER_ADMIN = "Can not delete admin user with given id";
+    public static final String NO_USER_WITH_GIVEN_ID = "No user exists with given id";
+    public static final String NO_USER_WITH_GIVEN_EMAIL = "No user exists with given email";
+    public static final String EMAIL_OR_MOBILE_ALREADY_IN_USE = "email or mobile already in use";
+
+    public static final String SOMETHING_WENT_WRONG = "Something went wrong, please retry after some time";
+
 }

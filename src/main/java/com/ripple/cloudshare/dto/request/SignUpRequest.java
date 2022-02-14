@@ -72,6 +72,17 @@ public class SignUpRequest {
         this.password = password;
     }
 
+    public SignUpRequest(@NotNull(message = "name can not be empty") String name, @NotNull(message = "email can not be empty") @Pattern(regexp = EMAIL_VALIDATION_REGEX,
+            message = "email should be valid") String email, @NotNull(message = "mobile can not be empty") @Pattern(regexp = MOBILE_VALIDATION_REGEX,
+            message = "mobile should be valid 10 digit") String mobile, @ValueOfEnum(enumClass = UserType.class,
+            message = INVALID_USER_TYPE_MESSAGE) String userType, @NotNull(message = "password can not be empty") String password) {
+        this.name = name;
+        this.email = email;
+        this.mobile = mobile;
+        this.userType = userType;
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "SignUpRequest{" +
