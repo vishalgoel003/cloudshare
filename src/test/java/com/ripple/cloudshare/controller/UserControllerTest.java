@@ -2,131 +2,116 @@ package com.ripple.cloudshare.controller;
 
 import com.ripple.cloudshare.data.dao.UserDAOService;
 import com.ripple.cloudshare.data.entity.User;
+import com.ripple.cloudshare.data.entity.UserType;
 import com.ripple.cloudshare.dto.entity.UserDTO;
 import com.ripple.cloudshare.exception.RippleAppRuntimeException;
 import com.ripple.cloudshare.exception.RippleUserRuntimeException;
 import com.ripple.cloudshare.security.SecurityUser;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
-import static com.ripple.cloudshare.ApplicationConstants.*;
+import static com.ripple.cloudshare.ApplicationConstants.SELF_DESTRUCT_NOT_ALLOWED;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
-@Disabled
-@SpringBootTest
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Autowired
-    private UserController userController;
+    public static final String TEST_USER = "Test User";
+    public static final String TEST_EMAIL = "test@gmail.com";
+    public static final String TEST_MOBILE = "9876543219";
 
-    @Autowired
-    private UserDAOService userDAOService;
+    @Mock
+    UserDAOService userDAOService;
 
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    void getUserWithAuth() {
-        UserDTO dto = userController.getUser("1");
-        Assertions.assertNotNull(dto);
+    @InjectMocks
+    UserController controller;
+
+    @Mock
+    User mockUser;
+
+    @Mock
+    SecurityUser mockSecurityUser;
+
+    @BeforeEach
+    void setup() {
+        when(mockUser.getId()).thenReturn(1l);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(mockUser.getEmail()).thenReturn(TEST_EMAIL);
+        when(mockUser.getMobile()).thenReturn(TEST_MOBILE);
+        when(mockUser.getUserType()).thenReturn(UserType.NON_ADMIN);
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
-    void getUserWithAuthInvalidUserId() {
-        Integer fakeUserId = (new Random()).nextInt(1000) + 1000;
+    void getUser() {
+        when(userDAOService.getById(eq(1l))).thenReturn(mockUser);
+
+        UserDTO userDTO = controller.getUser("1");
+
+        assertEquals(1l, userDTO.getId());
+        assertEquals(TEST_USER, userDTO.getName());
+        assertEquals(TEST_EMAIL, userDTO.getEmail());
+        assertEquals(TEST_MOBILE, userDTO.getMobile());
+        assertEquals(UserType.NON_ADMIN.name(), userDTO.getUserType());
 
         RippleUserRuntimeException ex = assertThrows(RippleUserRuntimeException.class, () -> {
-            userController.getUser(fakeUserId.toString());
+            controller.getUser("abc");
         });
-        assertEquals(NO_USER_WITH_GIVEN_ID, ex.getMessage());
+        assertEquals("Invalid Id", ex.getMessage());
     }
 
     @Test
-    void getUserWithoutAuth() {
-        Assertions.assertThrows(Exception.class, () -> {
-            userController.getUser("1");
-        });
+    void getCurrentUser() {
+        when(userDAOService.getById(eq(1l))).thenReturn(mockUser);
+        when(mockSecurityUser.getId()).thenReturn(1l);
+
+        UserDTO userDTO = controller.getCurrentUser(mockSecurityUser);
+
+        assertEquals(1l, userDTO.getId());
+        assertEquals(TEST_USER, userDTO.getName());
+        assertEquals(TEST_EMAIL, userDTO.getEmail());
+        assertEquals(TEST_MOBILE, userDTO.getMobile());
+        assertEquals(UserType.NON_ADMIN.name(), userDTO.getUserType());
     }
 
     @Test
-    void getCurrentUserWithValidUser() {
-        //Valid security user
-        User user = userDAOService.getByEmail("no-reply@ripple.com");
-        SecurityUser securityUser = SecurityUser.create(user);
+    void getAllUsers() {
+        when(mockUser.getId()).thenReturn(1l).thenReturn(2l);
+        when(userDAOService.getAllUsers()).thenReturn(Arrays.asList(mockUser, mockUser));
 
-        UserDTO dto = userController.getCurrentUser(securityUser);
-        assertNotNull(dto);
+        List<UserDTO> users = controller.getAllUsers();
+
+        assertEquals(2, users.size());
+        assertTrue(users.stream().anyMatch(user -> user.getId() == 1l));
+        assertTrue(users.stream().anyMatch(user -> user.getId() == 2l));
     }
 
     @Test
-    @WithMockUser(roles = {"NON_ADMIN"})
-    void getAllUsersWithoutAdminRole() {
-        assertThrows(Exception.class, () -> {
-            userController.getAllUsers();
-        });
-    }
+    void deleteUser() {
+        when(userDAOService.deleteById(eq(1l))).thenReturn(mockUser);
+        when(mockSecurityUser.getId()).thenReturn(2l);
 
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    void getAllUsersWithAdminRole() {
-        List<UserDTO> users = userController.getAllUsers();
+        UserDTO userDTO = controller.deleteUser("1", mockSecurityUser);
 
-        assertNotNull(users);
-        assertNotEquals(0, users.size());
-    }
+        assertEquals(1l, userDTO.getId());
+        assertEquals(TEST_USER, userDTO.getName());
+        assertEquals(TEST_EMAIL, userDTO.getEmail());
+        assertEquals(TEST_MOBILE, userDTO.getMobile());
+        assertEquals(UserType.NON_ADMIN.name(), userDTO.getUserType());
 
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    void deleteUserOtherNonAdmin() {
-        //Valid security user with admin
-        User user = userDAOService.getByEmail("no-reply@ripple.com");
-        SecurityUser securityUser = SecurityUser.create(user);
-
-        User normalUser = userDAOService.getByEmail("vishalgoel5@gmail.com");
-
-        assertDoesNotThrow(() -> {
-            userController.deleteUser(normalUser.getId().toString(), securityUser);
-        });
-        User deletedUser = userDAOService.getByEmail("vishalgoel5@gmail.com");
-        assertEquals(true, deletedUser.getDeleted());
-    }
-
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    void deleteUserSelf() {
-        //Valid security user with admin
-        User user = userDAOService.getByEmail("no-reply@ripple.com");
-        SecurityUser securityUser = SecurityUser.create(user);
+        when(mockSecurityUser.getId()).thenReturn(1l);
 
         RippleAppRuntimeException ex = assertThrows(RippleAppRuntimeException.class, () -> {
-            userController.deleteUser(user.getId().toString(), securityUser);
+            controller.deleteUser("1", mockSecurityUser);
         });
-
         assertEquals(SELF_DESTRUCT_NOT_ALLOWED, ex.getMessage());
-    }
-
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    void deleteUserOtherAdmin() {
-        //Valid security user with admin
-        User user = userDAOService.getByEmail("no-reply@ripple.com");
-        SecurityUser securityUser = SecurityUser.create(user);
-
-        User otherAdminUser = userDAOService.getByEmail("vishalgoel03@gmail.com");
-
-        RippleUserRuntimeException ex = assertThrows(RippleUserRuntimeException.class, () -> {
-            userController.deleteUser(otherAdminUser.getId().toString(), securityUser);
-        });
-
-        assertEquals(ADMIN_CAN_NOT_DELETE_OTHER_ADMIN, ex.getMessage());
-        assertEquals(HttpStatus.BAD_REQUEST, ex.getResponseStatus());
     }
 }

@@ -75,7 +75,7 @@ public class MachineController {
     public List<VirtualMachineDetail> getGlobalTopMachines(@AuthUser SecurityUser currentUser,
                                                            @RequestParam Optional<Integer> limit){
         logger.info("getGlobalTopMachines called for user id: " + currentUser.getId() + ", limit: "
-                + limit.map(Object::toString).orElse("not provided, using default"));
+                + (limit.isPresent() ? limit.get() : "absent"));
         return virtualMachineDAOService.getLiveVirtualMachinesOrderByRam(limit.orElse(10));
     }
 

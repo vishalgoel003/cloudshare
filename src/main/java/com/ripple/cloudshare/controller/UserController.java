@@ -1,6 +1,5 @@
 package com.ripple.cloudshare.controller;
 
-import com.ripple.cloudshare.ApplicationConstants;
 import com.ripple.cloudshare.data.dao.UserDAOService;
 import com.ripple.cloudshare.dto.RequestParamConverter;
 import com.ripple.cloudshare.dto.entity.UserDTO;

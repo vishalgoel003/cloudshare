@@ -5,7 +5,6 @@ import com.ripple.cloudshare.data.entity.UserType;
 import com.ripple.cloudshare.data.repository.UserRepository;
 import com.ripple.cloudshare.dto.request.SignUpRequest;
 import com.ripple.cloudshare.exception.RippleUserRuntimeException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -44,10 +43,6 @@ class UserDAOServiceTest {
 
     @Mock
     VirtualMachineDAOService virtualMachineDAOService;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void createUser() {
