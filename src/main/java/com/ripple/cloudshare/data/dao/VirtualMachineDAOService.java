@@ -16,10 +16,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.ripple.cloudshare.ApplicationConstants.*;
+
 @Service
 public class VirtualMachineDAOService {
 
-    public static final String TOP_LEVEL_DOMAIN = "cloud.ripple.com";
     private static final String CLASS_NAME = "VirtualMachineDAOService";
 
     private static final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -70,7 +71,7 @@ public class VirtualMachineDAOService {
                     vm.generateUrl(TOP_LEVEL_DOMAIN);
                     return vm;
                 })
-                .orElseThrow(() -> new RippleUserRuntimeException("No live machine found with given id"));
+                .orElseThrow(() -> new RippleUserRuntimeException(NO_MACHINE_WITH_ID));
     }
 
     public VirtualMachineDetail getLiveVirtualMachineForUserById(Long virtualMachineId, Long userId) {
@@ -80,18 +81,18 @@ public class VirtualMachineDAOService {
                     vm.generateUrl(TOP_LEVEL_DOMAIN);
                     return vm;
                 })
-                .orElseThrow(() -> new RippleUserRuntimeException("No live machine found with given id for the user"));
+                .orElseThrow(() -> new RippleUserRuntimeException(NO_MACHINE_WITH_ID_FOR_USER));
     }
 
     public VirtualMachineDetail acquireVirtualMachineFromCloudManager(Long userId, VirtualMachineRequest virtualMachineRequest) {
         if(!cloudManager.checkAvailability(virtualMachineRequest)){
-            throw new RippleAppRuntimeException("All servers are tightly occupied, please try later");
+            throw new RippleAppRuntimeException(NO_CAPACITY_AVAILABLE);
         }
         User userStub = new User();
         userStub.setId(userId);
         VirtualMachineDetail vmDetail = cloudManager.acquireVirtualMachine(userStub, virtualMachineRequest);
         if (vmDetail == null) {
-            throw new RippleAppRuntimeException("Could not serve request, please try later");
+            throw new RippleAppRuntimeException(NO_CAPACITY_AVAILABLE);
         }
         vmDetail.generateUrl(TOP_LEVEL_DOMAIN);
         return vmDetail;
@@ -108,10 +109,10 @@ public class VirtualMachineDAOService {
             if (success) {
                 return virtualMachineDetail;
             } else {
-                throw new RippleAppRuntimeException("Could not remove requested VM to delete");
+                throw new RippleAppRuntimeException(COULD_NOT_REMOVE_VM);
             }
         } else {
-            throw new RippleUserRuntimeException("Could not find requested VM to delete");
+            throw new RippleUserRuntimeException(COULD_NOT_REMOVE_VM);
         }
     }
 

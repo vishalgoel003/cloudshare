@@ -21,6 +21,13 @@ public class ApplicationConstants {
     public static final String NO_USER_WITH_GIVEN_EMAIL = "No user exists with given email";
     public static final String EMAIL_OR_MOBILE_ALREADY_IN_USE = "email or mobile already in use";
 
+    public static final String NO_MACHINE_WITH_ID = "No live machine found with given id";
+    public static final String NO_MACHINE_WITH_ID_FOR_USER = "No live machine found with given id for the user";
+    public static final String NO_CAPACITY_AVAILABLE = "All servers are tightly occupied, please try later";
+    public static final String COULD_NOT_REMOVE_VM = "Could not remove requested VM to delete";
+
     public static final String SOMETHING_WENT_WRONG = "Something went wrong, please retry after some time";
 
+    //Other constants
+    public static final String TOP_LEVEL_DOMAIN = "cloud.ripple.com";
 }
