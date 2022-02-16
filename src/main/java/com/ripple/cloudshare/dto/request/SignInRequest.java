@@ -31,6 +31,12 @@ public class SignInRequest {
         this.password = password;
     }
 
+    public SignInRequest(@NotNull(message = "email can not be empty") @Pattern(regexp = EMAIL_VALIDATION_REGEX,
+            message = "email should be valid") String email, @NotNull(message = "password can not be empty") String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "SignInRequest{" +
